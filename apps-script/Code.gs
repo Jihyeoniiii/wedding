@@ -6,7 +6,9 @@
  */
 
 var FOLDER_ID = '1CWQWA-ZNh_DZ_5HCkth9YVfuB6G7VbQW';   // WeddingPhoto. 폴더
-var ADMIN_PASSWORD = '관리자비번바꾸기';                   // 이 비번이면 어떤 방명록이든 삭제 가능
+var SHEET_ID = '1UWwMeZjg8zyJYSwUvMf5exGGstdcaFnEM6GPKD4h3jE'; // "청첩장 데이터" 시트 (방명록, 참석여부)
+// 관리자 비번(어떤 방명록이든 삭제 가능)은 코드에 쓰지 마세요. 프로젝트 설정(톱니) > 스크립트 속성에 ADMIN_PASSWORD 로 넣으면 돼요.
+var ADMIN_PASSWORD = PropertiesService.getScriptProperties().getProperty('ADMIN_PASSWORD') || '';
 var TZ = 'Asia/Seoul';
 // 권한 안내용 (지우지 마세요): DriveApp.createFile()
 
@@ -129,7 +131,8 @@ function deleteGuestbook(d) {
   for (var i = 0; i < ids.length; i++) {
     if (String(ids[i][0]) === String(d.id)) {
       var row = i + 2, saved = sh.getRange(row, 5).getValue();
-      if (String(d.pw) !== ADMIN_PASSWORD && saved !== hash(String(d.pw || ''), String(d.id))) throw new Error('wrong password');
+      var isAdmin = ADMIN_PASSWORD && String(d.pw) === ADMIN_PASSWORD;
+      if (!isAdmin && saved !== hash(String(d.pw || ''), String(d.id))) throw new Error('wrong password');
       withLock(function () { sh.deleteRow(row); });
       return { ok: true };
     }
@@ -149,7 +152,7 @@ function addRsvp(d) {
 
 /* ---------- 공통 ---------- */
 function sheet(name, headers) {
-  var ss = SpreadsheetApp.getActiveSpreadsheet(), sh = ss.getSheetByName(name);
+  var ss = SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet(), sh = ss.getSheetByName(name);
   if (!sh) { sh = ss.insertSheet(name); sh.appendRow(headers); sh.setFrozenRows(1); sh.getRange(1, 1, 1, headers.length).setFontWeight('bold'); }
   return sh;
 }
