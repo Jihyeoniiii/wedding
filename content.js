@@ -50,7 +50,7 @@ window.CONTENT = {
     "api": {
       "scriptUrl": "https://script.google.com/macros/s/AKfycbwSHBnICKGJKkT_W0L70sqEO8likW9cq0POGwQsm97Un8jRE_Ap7c25eSVfE2hKZnLQ5g/exec"
     },
-    "rsvpPopup": false,
+    "rsvpPopup": true,
     "kakaoKey": "",
     "footer": "Junhee & Jihyun",
     "github": {
@@ -58,7 +58,7 @@ window.CONTENT = {
       "repo": "wedding",
       "branch": "main"
     },
-    "_pub": 1793712419388
+    "_pub": 1793713102332
   },
   "blocks": [
     {
