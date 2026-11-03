@@ -751,8 +751,8 @@
     if (EDIT) {
       if (window.InviteEditor) window.InviteEditor.init(Invite);
       else {
-        var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/editor.css'; document.head.appendChild(l);
-        var s = document.createElement('script'); s.src = 'js/editor.js'; s.onload = function () { window.InviteEditor.init(Invite); }; document.body.appendChild(s);
+        var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/editor.css?v=' + Date.now(); document.head.appendChild(l);
+        var s = document.createElement('script'); s.src = 'js/editor.js?v=' + Date.now(); s.onload = function () { window.InviteEditor.init(Invite); }; document.body.appendChild(s);
       }
     } else if (S().rsvpPopup) setTimeout(rsvpPopup, 1200);
   }
