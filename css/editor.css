@@ -1,6 +1,7 @@
 /* 편집 모드 전용 스타일 (?edit 일 때만 불러옴) */
 body.editing { padding-top: 50px; }
-body.editing .topbar, body.editing .fab-wrap { display: none; }
+body.editing:not(.ed-preview) .topbar, body.editing:not(.ed-preview) .fab-wrap { display: none; }
+body.ed-preview .topbar { top: 50px; }
 body.editing .music-fab { top: 56px; }
 
 .ed-bar { position: fixed; top: 0; left: 0; right: 0; height: 50px; z-index: 200; display: flex; align-items: center; gap: 6px; padding: 0 10px; background: #2d2a28; color: #fff; font-family: -apple-system, 'Pretendard', 'Malgun Gothic', sans-serif; box-shadow: 0 2px 10px rgba(0,0,0,.2); }
@@ -28,20 +29,20 @@ body.editing .blk:hover .ed-add, body.editing .blk.ed-sel .ed-add { opacity: 1; 
 @media (hover: none) { .ed-add { opacity: .9; } }
 
 /* inline text */
-body.editing #app [data-edit] { cursor: text; border-radius: 3px; transition: background .15s, box-shadow .15s; min-height: 1.2em; }
+body.editing:not(.ed-preview) #app [data-edit] { cursor: text; border-radius: 3px; transition: background .15s, box-shadow .15s; min-height: 1.2em; }
 body.editing #app [data-edit]:hover { background: rgba(224,141,98,.07); box-shadow: 0 0 0 1px rgba(224,141,98,.25); }
 body.editing #app [data-edit].ed-editing { white-space: pre-wrap; background: #fff; color: var(--text); box-shadow: 0 0 0 2px var(--accent); outline: none; }
 body.editing #app [data-edit].empty:not(.ed-editing):before { content: attr(data-hint); color: #c9b3a6; font-size: 13px; }
-body.editing #app .cv-sub.empty { opacity: 1; animation: none; }
+body.editing:not(.ed-preview) #app .cv-sub.empty { opacity: 1; animation: none; }
 body.editing #app .t-ending .frame .ov.empty:before { color: #fff; }
 body.editing #app [data-img] { cursor: pointer; }
 body.editing #app [data-img]:hover { filter: brightness(.92); }
 body.editing #app .ph { color: #a88a78; font-size: 13px; }
 body.editing .edit-hint { display: block; margin: 12px auto 0; max-width: 340px; padding: 8px 12px; font: 12.5px/1.6 -apple-system, 'Pretendard', 'Malgun Gothic', sans-serif; color: #a5735a; background: #fff7f1; border: 1px dashed #edc6af; border-radius: 8px; }
 body.editing .pl-empty { height: 160px; cursor: pointer; font-size: 15px; }
-body.editing .hw { clip-path: none; }
-body.editing .hw text { animation: none !important; fill: #fff; stroke-width: 0; }
-body.editing .cv-sub { opacity: 1; animation: none; }
+body.editing:not(.ed-preview) .hw { clip-path: none; }
+body.editing:not(.ed-preview) .hw text { animation: none !important; fill: #fff; stroke-width: 0; }
+body.editing:not(.ed-preview) .cv-sub { opacity: 1; animation: none; }
 
 /* preview */
 body.ed-preview .empty, body.ed-preview .edit-hint, body.ed-preview .is-hidden, body.ed-preview .pl-empty { display: none !important; }

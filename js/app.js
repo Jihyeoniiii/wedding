@@ -343,26 +343,37 @@
     afterRender();
   }
 
-  function afterRender() {
-    // 메인 손글씨: 글씨 모양에 맞춰 크기를 맞춘 뒤 왼쪽부터 써지게
+  // 메인 손글씨: 글씨 모양에 맞춰 크기를 맞춘 뒤 왼쪽부터 써지게
+  function playHandwriting() {
     $$('.hw').forEach(function (svg) {
+      svg.classList.remove('go');
       var go = function () {
         var t = $('text', svg);
         try { var bb = t.getBBox(); if (bb.width > 0) svg.setAttribute('viewBox', (bb.x - 24) + ' ' + (bb.y - 12) + ' ' + (bb.width + 48) + ' ' + (bb.height + 24)); } catch (e) {}
+        void svg.getBoundingClientRect();
         requestAnimationFrame(function () { svg.classList.add('go'); });
       };
       if (document.fonts && document.fonts.load) document.fonts.load('120px "Great Vibes"').then(go, go); else go();
     });
-    // 요소별 등장 효과 (원본처럼 하나씩, 끝은 부드럽게 감속)
+    $$('.cv-sub').forEach(function (s) { s.style.animation = 'none'; void s.offsetWidth; s.style.animation = ''; });
+  }
+  // 요소별 등장 효과 (원본처럼 하나씩, 끝은 부드럽게 감속)
+  function setupReveal(animate) {
     if (revealIO) revealIO.disconnect();
     var els = $$('.rv');
-    if (EDIT || !('IntersectionObserver' in window)) els.forEach(function (el) { el.classList.add('in'); });
-    else {
-      revealIO = new IntersectionObserver(function (ents) {
-        ents.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); } });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
-      els.forEach(function (el) { revealIO.observe(el); });
-    }
+    if (!animate || !('IntersectionObserver' in window)) { els.forEach(function (el) { el.classList.add('in'); }); return; }
+    els.forEach(function (el) { el.style.transition = 'none'; el.classList.remove('in'); });
+    void document.body.offsetHeight;
+    els.forEach(function (el) { el.style.transition = ''; });
+    revealIO = new IntersectionObserver(function (ents) {
+      ents.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); revealIO.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.01 });
+    els.forEach(function (el) { revealIO.observe(el); });
+  }
+
+  function afterRender() {
+    playHandwriting();
+    setupReveal(!EDIT);
     // 넘겨보기 점 표시
     if ('IntersectionObserver' in window) $$('.pl-slide').forEach(function (sl) {
       var dots = $$('i', sl.nextElementSibling), items = $$('.pi', sl);
@@ -741,6 +752,8 @@
   var Invite = window.Invite = {
     EDIT: EDIT, get: get, set: set, P: P, esc: esc, fmt: fmt, has: has, imgMap: imgMap, LABEL: LABEL, LAYOUTS: LAYOUTS, FONTS: FONTS,
     render: render, toast: toast, modal: modal,
+    // 편집 모드 [미리보기]: 손님 화면과 똑같이 움직임을 다시 재생
+    replayMotion: function () { window.scrollTo(0, 0); playHandwriting(); setupReveal(true); onScroll(); },
     content: function () { return C; },
     setContent: function (c) { C = window.CONTENT = c; render(); }
   };

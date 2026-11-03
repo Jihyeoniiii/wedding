@@ -528,7 +528,7 @@
     if (name === 'preview') {
       var on = document.body.classList.toggle('ed-preview');
       $('[data-ed="preview"]').textContent = on ? '편집으로' : '미리보기';
-      if (on) { closePanel(); $$('.ed-chip,.ed-add').forEach(function (x) { x.remove(); }); $$('#app [data-edit]').forEach(function (el) { el.removeAttribute('contenteditable'); }); window.scrollTo(0, 0); }
+      if (on) { closePanel(); $$('.ed-chip,.ed-add').forEach(function (x) { x.remove(); }); $$('#app [data-edit]').forEach(function (el) { el.removeAttribute('contenteditable'); }); I.replayMotion(); }
       else I.render();
       return;
     }
