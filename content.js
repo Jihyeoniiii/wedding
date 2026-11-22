@@ -51,14 +51,14 @@ window.CONTENT = {
       "scriptUrl": "https://script.google.com/macros/s/AKfycbwSHBnICKGJKkT_W0L70sqEO8likW9cq0POGwQsm97Un8jRE_Ap7c25eSVfE2hKZnLQ5g/exec"
     },
     "rsvpPopup": true,
-    "kakaoKey": "",
+    "kakaoKey": "fc0dd26ff72c51044bdfa9001b571578",
     "footer": "Junhee & Jihyun",
     "github": {
       "owner": "Jihyeoniiii",
       "repo": "wedding",
       "branch": "main"
     },
-    "_pub": 1795332041627,
+    "_pub": 1795333489811,
     "effect": "heart"
   },
   "blocks": [
