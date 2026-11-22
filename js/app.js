@@ -327,7 +327,8 @@
       return '<div class="acc-group rv"><button class="acc-head ' + cls + '" data-act="acc">' + title + ICON.down + '</button><div class="acc-body">' + list.map(function (x) {
         return '<div class="acc-row"><div class="info"><div><b>' + esc(x.role || '') + '</b>' + esc(x.name || '') + '</div><div>' + esc(x.bank || '') + ' ' + esc(x.number) + '</div></div>' +
           '<div class="btns"><button data-copy="' + esc((x.bank || '') + ' ' + x.number) + '" data-msg="계좌번호가 복사되었습니다.">복사하기</button>' +
-          (has(x.kakaopay) ? '<a class="kp" href="' + esc(x.kakaopay) + '" target="_blank" rel="noopener">카카오페이</a>' : '') + '</div></div>';
+          (has(x.kakaopay) ? '<a class="kp" href="' + esc(x.kakaopay) + '" target="_blank" rel="noopener">카카오페이</a>' : '') +
+            (has(x.toss) ? '<a class="tp" href="' + esc(x.toss) + '" target="_blank" rel="noopener">토스</a>' : '') + '</div></div>';
       }).join('') + '</div></div>';
     }
     return T(p + '.title', 'h2', 'sec-title rv') + T(p + '.text', 'p', 'sec-text rv') + grp(g, '신랑측', 'g') + grp(br, '신부측', 'b') +
