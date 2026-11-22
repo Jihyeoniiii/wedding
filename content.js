@@ -58,8 +58,8 @@ window.CONTENT = {
       "repo": "wedding",
       "branch": "main"
     },
-    "_pub": 1795327237481,
-    "effect": "confetti"
+    "_pub": 1795332041627,
+    "effect": "heart"
   },
   "blocks": [
     {

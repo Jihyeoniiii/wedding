@@ -195,7 +195,7 @@
     { k: 'site.wedding.tbdText', t: 'textarea', l: '날짜 미정일 때 문구' },
     { t: 'head', l: '디자인' },
     { k: 'site.theme.accent', t: 'color', l: '포인트 색' },
-    { k: 'site.effect', t: 'select', l: '떨어지는 효과 ([미리보기]에서 확인)', o: [['', '없음'], ['confetti', '컨페티'], ['sakura', '벚꽃'], ['snow', '눈'], ['daisy', '데이지'], ['star', '별']] },
+    { k: 'site.effect', t: 'select', l: '떨어지는 효과 ([미리보기]에서 확인)', o: [['', '없음'], ['heart', '하트'], ['confetti', '컨페티'], ['sakura', '벚꽃'], ['snow', '눈'], ['daisy', '데이지'], ['star', '별']] },
     { k: 'site.theme.font', t: 'select', l: '글꼴', o: [['chosun', '조선굴림 (원본)'], ['nanum', '나눔명조'], ['gowun', '고운바탕'], ['maru', '마루부리'], ['pretendard', '프리텐다드 (고딕)']] },
     { k: 'site.footer', t: 'text', l: '맨 아래 영문 손글씨' },
     { t: 'head', l: '배경음악' },

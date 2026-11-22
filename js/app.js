@@ -466,14 +466,16 @@
     var N = type === 'confetti' ? 34 : type === 'snow' ? 40 : 26, parts = [];
     function size() { W = Math.min(window.innerWidth, 480); H = window.innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; cx.setTransform(dpr, 0, 0, dpr, 0, 0); }
     function make(top) {
-      var s = type === 'snow' ? 2 + Math.random() * 3.5 : type === 'confetti' ? 6 + Math.random() * 5 : 8 + Math.random() * 7;
+      var s = type === 'heart' ? 13 + Math.random() * 9 : type === 'snow' ? 2 + Math.random() * 3.5 : type === 'confetti' ? 6 + Math.random() * 5 : 8 + Math.random() * 7;
       return { x: Math.random() * W, y: top ? -20 - Math.random() * H * 0.3 : Math.random() * H, s: s,
         vy: (type === 'snow' ? 18 : type === 'confetti' ? 42 : 30) * (0.6 + Math.random() * 0.8), vx: (Math.random() - 0.5) * 14,
-        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * (type === 'confetti' ? 4 : 1.6), ph: Math.random() * 6.28,
-        c: CONF[(Math.random() * CONF.length) | 0] };
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * (type === 'confetti' ? 4 : type === 'heart' ? 0.6 : 1.6), ph: Math.random() * 6.28,
+        c: CONF[(Math.random() * CONF.length) | 0], hc: (Math.random() * 4) | 0 };
     }
     function petal(p) { cx.fillStyle = 'rgba(247,190,204,.9)'; cx.beginPath(); cx.moveTo(0, -p.s * .55); cx.bezierCurveTo(p.s * .6, -p.s * .5, p.s * .5, p.s * .45, 0, p.s * .55); cx.bezierCurveTo(-p.s * .5, p.s * .45, -p.s * .6, -p.s * .5, 0, -p.s * .55); cx.fill(); cx.fillStyle = 'rgba(255,255,255,.9)'; cx.beginPath(); cx.moveTo(0, -p.s * .55); cx.lineTo(p.s * .12, -p.s * .3); cx.lineTo(-p.s * .12, -p.s * .3); cx.fill(); }
     function daisy(p) { var r = p.s * .5; cx.fillStyle = '#fff'; cx.strokeStyle = 'rgba(0,0,0,.12)'; cx.lineWidth = .6; for (var i = 0; i < 7; i++) { cx.save(); cx.rotate(i * 0.8976); cx.beginPath(); cx.ellipse(0, -r * .62, r * .26, r * .5, 0, 0, 6.28); cx.fill(); cx.stroke(); cx.restore(); } cx.fillStyle = '#f5c84c'; cx.beginPath(); cx.arc(0, 0, r * .3, 0, 6.28); cx.fill(); }
+    var HEARTS = ['#f4a6b8', '#f7c1cd', '#ee8fa4', '#f9d3dc'];
+    function heart(p) { var r = p.s * .5; cx.globalAlpha = .85; cx.fillStyle = HEARTS[p.hc]; cx.beginPath(); cx.moveTo(0, r * .35); cx.bezierCurveTo(-r * 1.1, -r * .3, -r * .55, -r * 1.05, 0, -r * .45); cx.bezierCurveTo(r * .55, -r * 1.05, r * 1.1, -r * .3, 0, r * .35); cx.closePath(); cx.fill(); cx.globalAlpha = 1; }
     function star(p) { var r = p.s * .5, tw = .55 + .45 * Math.sin(p.ph * 2); cx.fillStyle = 'rgba(245,204,96,' + tw + ')'; cx.beginPath(); for (var i = 0; i < 10; i++) { var rr = i % 2 ? r * .45 : r, a = i * .6283 - 1.5708; cx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } cx.closePath(); cx.fill(); }
     function draw(p) {
       cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot);
@@ -481,6 +483,7 @@
       else if (type === 'snow') { cx.fillStyle = 'rgba(205,219,236,.95)'; cx.beginPath(); cx.arc(0, 0, p.s, 0, 6.28); cx.fill(); }
       else if (type === 'sakura') petal(p);
       else if (type === 'daisy') daisy(p);
+      else if (type === 'heart') heart(p);
       else star(p);
       cx.restore();
     }
