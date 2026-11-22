@@ -126,8 +126,9 @@
   ];
   var SCHEMA = {
     cover: [{ k: 'photo', t: 'image', l: '메인 사진' }, { k: 'script', t: 'text', l: '사진 위 손글씨 (영어 추천)' }, { k: 'sub', t: 'text', l: '손글씨 아래 작은 글씨', ph: '예: 2027. 10. 09 SAT' }],
-    greeting: [{ k: 'title', t: 'text', l: '제목' }, { k: 'text', t: 'textarea', l: '인사말' }],
-    quote: [{ k: 'text', t: 'textarea', l: '글귀' }, { k: 'source', t: 'text', l: '출처' }],
+    greeting: [{ k: 'title', t: 'text', l: '제목' }, { t: 'samples', kind: 'greeting', l: '인사말 샘플에서 고르기' }, { k: 'text', t: 'textarea', l: '인사말' }],
+    quote: [{ t: 'samples', kind: 'quote', l: '글귀 샘플에서 고르기' }, { k: 'text', t: 'textarea', l: '글귀' }, { k: 'source', t: 'text', l: '출처' }],
+    video: [{ k: 'title', t: 'text', l: '제목 (선택)' }, { k: 'url', t: 'text', l: '유튜브 주소', ph: 'https://youtu.be/... 또는 쇼츠 주소' }, { k: 'caption', t: 'text', l: '설명 (선택)' }, { t: 'note', l: '유튜브에서 [공유] > [복사]한 주소를 붙여넣으면 돼요. 영상은 공개 또는 일부 공개여야 보여요.' }],
     profile: [{ t: 'note', l: '이름, 연락처, 혼주 정보는 [기본정보]에서 고쳐요.' }, { k: 'groomPhoto', t: 'image', l: '신랑 사진' }, { k: 'groomBio', t: 'textarea', l: '신랑 소개' }, { k: 'bridePhoto', t: 'image', l: '신부 사진' }, { k: 'brideBio', t: 'textarea', l: '신부 소개' }],
     calendar: [{ k: 'title', t: 'text', l: '제목' }, { t: 'note', l: '날짜, 시간, 예식장은 [기본정보]에서 넣어요. 날짜를 넣으면 달력과 D-day가 자동으로 생겨요.' }],
     location: [{ k: 'title', t: 'text', l: '제목' }, { t: 'note', l: '예식장 이름과 주소는 [기본정보]에서 넣어요.' },
@@ -159,6 +160,7 @@
     location: { title: '오시는 길', items: [] },
     notice: { title: '피로연 안내', text: '내용을 적어주세요.', button: '', url: '' },
     photos: { title: '', layout: 'two', ratio: '', gap: '', photos: [], caption: '' },
+    video: { title: '', url: '', caption: '' },
     gallery: { title: '갤러리', layout: 'grid', photos: [] },
     interview: { title: '웨딩 인터뷰', text: '두 분의 인터뷰를 준비했습니다.', items: [{ q: '새 질문', a: '' }] },
     history: { title: '우리의 히스토리', items: [{ date: '20XX', title: '첫만남', text: '', photo: '' }] },
@@ -172,8 +174,8 @@
     wreath: { url: '', text: '축하의 마음을 담아 전해보세요.' },
     ending: { photo: '', text: '' }
   };
-  var ADD_ORDER = ['photos', 'text', 'notice', 'gallery', 'greeting', 'quote', 'profile', 'calendar', 'location', 'interview', 'history', 'tabs', 'accounts', 'rsvp', 'photoShare', 'guestbook', 'together', 'wreath', 'ending'];
-  var ADD_DESC = { photos: '사진을 원하는 모양으로 배치', text: '제목 + 글 + 사진', notice: '테두리 박스 안내 (피로연 등)', gallery: '눌러서 크게 보는 사진 모음' };
+  var ADD_ORDER = ['photos', 'video', 'text', 'notice', 'gallery', 'greeting', 'quote', 'profile', 'calendar', 'location', 'interview', 'history', 'tabs', 'accounts', 'rsvp', 'photoShare', 'guestbook', 'together', 'wreath', 'ending'];
+  var ADD_DESC = { video: '유튜브 영상 넣기', photos: '사진을 원하는 모양으로 배치', text: '제목 + 글 + 사진', notice: '테두리 박스 안내 (피로연 등)', gallery: '눌러서 크게 보는 사진 모음' };
 
   var SITE = [
     { t: 'head', l: '신랑' },
@@ -193,6 +195,7 @@
     { k: 'site.wedding.tbdText', t: 'textarea', l: '날짜 미정일 때 문구' },
     { t: 'head', l: '디자인' },
     { k: 'site.theme.accent', t: 'color', l: '포인트 색' },
+    { k: 'site.effect', t: 'select', l: '떨어지는 효과 ([미리보기]에서 확인)', o: [['', '없음'], ['confetti', '컨페티'], ['sakura', '벚꽃'], ['snow', '눈'], ['daisy', '데이지'], ['star', '별']] },
     { k: 'site.theme.font', t: 'select', l: '글꼴', o: [['chosun', '조선굴림 (원본)'], ['nanum', '나눔명조'], ['gowun', '고운바탕'], ['maru', '마루부리'], ['pretendard', '프리텐다드 (고딕)']] },
     { k: 'site.footer', t: 'text', l: '맨 아래 영문 손글씨' },
     { t: 'head', l: '배경음악' },
@@ -203,7 +206,7 @@
     { t: 'head', l: '기능' },
     { k: 'site.rsvpPopup', t: 'toggle', l: '처음 접속할 때 참석 여부 팝업 띄우기' },
     { k: 'site.api.scriptUrl', t: 'text', l: '구글 연결 주소 (사진공유/방명록/참석여부)', ph: 'https://script.google.com/macros/s/.../exec' },
-    { k: 'site.kakaoKey', t: 'text', l: '카카오 JavaScript 키 (선택)' }
+    { k: 'site.kakaoKey', t: 'text', l: '카카오 JavaScript 키 (카톡 공유 카드, 카카오맵 지도)' }
   ];
 
   /* ---------------- 패널 (오른쪽 / 휴대폰은 아래) ---------------- */
@@ -231,6 +234,7 @@
   function field(f, base) {
     if (f.t === 'note') return '<p class="ed-note">' + esc(f.l) + '</p>';
     if (f.t === 'head') return '<h4 class="ed-head">' + esc(f.l) + '</h4>';
+    if (f.t === 'samples') return '<div class="ed-f"><button class="ed-btn2" data-samples="' + esc(f.kind) + '" data-base="' + esc(base) + '">✨ ' + esc(f.l) + '</button></div>';
     var path = base ? base + '.' + f.k : f.k, v = I.get(path), lab = '<label class="ed-l">' + esc(f.l) + '</label>';
     var ph = f.ph ? ' placeholder="' + esc(f.ph) + '"' : '';
     switch (f.t) {
@@ -346,6 +350,41 @@
         if (moved && to !== from) onMove(from, to);
       }
       window.addEventListener('pointermove', mv); window.addEventListener('pointerup', up); window.addEventListener('pointercancel', up);
+    });
+  }
+
+  /* ---------------- 인사말 / 글귀 샘플 ---------------- */
+  var SAMPLES = {
+    greeting: [
+      { text: '오랜 기다림 속에서 저희 두 사람,\n한 마음 되어 참된 사랑의 결실을\n맺게 되었습니다.\n\n오셔서 축복해 주시면 큰 기쁨이겠습니다.' },
+      { text: '서로가 마주보며 다져온 사랑을\n이제 함께 한곳을 바라보며\n걸어갈 수 있는 큰 사랑으로 키우고자 합니다.\n\n저희 두 사람의 앞날을\n축복해 주시면 감사하겠습니다.' },
+      { text: '평범했던 하루가\n서로를 만나 특별해졌습니다.\n\n이제 그 특별한 날들을\n평생 함께하려 합니다.\n약속하는 자리에 함께해 주시면 감사하겠습니다.' },
+      { text: '같은 곳을 바라보며\n같은 길을 걸어가려 합니다.\n\n늘 곁에서 응원해 주신 분들께\n감사의 마음을 담아 초대합니다.' },
+      { text: '작은 인연이 큰 사랑이 되어\n이제 한 가족이 되려 합니다.\n\n바쁘시더라도 귀한 시간 내어\n자리를 빛내 주시면\n더없는 기쁨으로 간직하겠습니다.' },
+      { text: '서로 다른 길을 걸어온 두 사람이\n이제 한 길을 함께 걸으려 합니다.\n\n저희의 첫걸음을\n따뜻한 마음으로 지켜봐 주세요.' },
+      { text: '봄꽃처럼 따뜻한 마음으로\n서로를 아끼며 살아가겠습니다.\n\n귀한 걸음 하시어\n저희의 새로운 시작을 축복해 주세요.' },
+      { text: '저희 결혼합니다.\n\n서로에게 가장 좋은 친구이자\n든든한 편이 되어주겠습니다.\n기쁜 날, 함께 웃어주세요.' },
+      { text: '저희 두 사람, 결혼을 약속했습니다.\n\n예식 날짜와 장소는 정해지는 대로\n다시 소식 전하겠습니다.\n지금처럼 따뜻한 마음으로 지켜봐 주세요.' },
+      { text: '저희 아들과 딸이\n사랑으로 하나 되어\n새로운 가정을 이루게 되었습니다.\n\n부디 오셔서\n두 사람의 앞날을 축복해 주십시오.' }
+    ],
+    quote: [
+      { text: 'You can not be happy every day.\nBut there are happy things every day.\n\n매일 행복할 순 없지만,\n행복한 것들은 매일 있어.', source: '<월트 디즈니>, 곰돌이 푸 中' },
+      { text: '사랑은 서로 마주 보는 것이 아니라\n함께 같은 방향을 바라보는 것이다.', source: '생텍쥐페리, 『인간의 대지』' },
+      { text: '사랑은 오래 참고\n사랑은 온유하며\n투기하는 자가 되지 아니하며\n사랑은 자랑하지 아니하며\n교만하지 아니하며', source: '고린도전서 13장 4절' },
+      { text: 'A successful marriage requires falling in love many times,\nalways with the same person.\n\n좋은 결혼은 여러 번 사랑에 빠지는 것,\n언제나 같은 사람과.', source: 'Mignon McLaughlin' },
+      { text: '함께라서 행복했던 날들처럼,\n앞으로의 날들도\n그렇게 걸어가겠습니다.', source: '' }
+    ]
+  };
+  function openSamples(kind, base) {
+    var list = SAMPLES[kind] || [];
+    var m = I.modal('<h3>' + (kind === 'quote' ? '글귀' : '인사말') + ' 샘플</h3><p class="ed-note">눌러서 넣고, 넣은 뒤 자유롭게 고칠 수 있어요.</p><div class="ed-samples">' + list.map(function (s, i) {
+      return '<button data-si="' + i + '">' + I.fmt(s.text) + (s.source ? '<small>' + esc(s.source) + '</small>' : '') + '</button>';
+    }).join('') + '</div>', 'ed-ui');
+    m.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-si]'); if (!b) return;
+      var s = list[+b.getAttribute('data-si')];
+      snapshot(); I.set(base + '.text', s.text); if (kind === 'quote') I.set(base + '.source', s.source || ''); lastSnap = '';
+      save(); m.close(); I.render(); refreshPanel(); I.toast('문구를 넣었어요.');
     });
   }
 
@@ -481,6 +520,7 @@
       if (type === 'photos' || type === 'gallery') setTimeout(function () { addPhotos('blocks.' + at + '.photos'); }, 300);
       return;
     }
+    if ((x = t.closest('[data-samples]'))) return openSamples(x.getAttribute('data-samples'), x.getAttribute('data-base'));
     if ((x = t.closest('[data-img-act]'))) return imgAct(x.getAttribute('data-img-act'), x.getAttribute('data-ip'));
     if ((x = t.closest('[data-ph-add]'))) return addPhotos(x.getAttribute('data-ph-add'));
     if ((x = t.closest('[data-ph-del]'))) { var pp = x.getAttribute('data-ph-del'), arr = (I.get(pp) || []).slice(); arr.splice(+x.getAttribute('data-k'), 1); commit(pp, arr, false); I.render(); return refreshPanel(); }
@@ -528,8 +568,8 @@
     if (name === 'preview') {
       var on = document.body.classList.toggle('ed-preview');
       $('[data-ed="preview"]').textContent = on ? '편집으로' : '미리보기';
-      if (on) { closePanel(); $$('.ed-chip,.ed-add').forEach(function (x) { x.remove(); }); $$('#app [data-edit]').forEach(function (el) { el.removeAttribute('contenteditable'); }); I.replayMotion(); }
-      else I.render();
+      if (on) { closePanel(); $$('.ed-chip,.ed-add').forEach(function (x) { x.remove(); }); $$('#app [data-edit]').forEach(function (el) { el.removeAttribute('contenteditable'); }); I.replayMotion(); I.effect(true); }
+      else { I.effect(false); I.render(); }
       return;
     }
     if (name === 'publish') return openPublish();

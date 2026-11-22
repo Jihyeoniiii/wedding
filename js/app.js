@@ -165,7 +165,7 @@
   /* ---------------- blocks ---------------- */
   var LABEL = {
     cover: '메인', greeting: '인사말', quote: '글귀', profile: '소개', calendar: '예식 안내', location: '오시는 길', notice: '박스 안내',
-    photos: '사진', gallery: '갤러리', interview: '웨딩 인터뷰', history: '히스토리', tabs: '탭 안내', text: '자유 글', accounts: '마음 전하실 곳',
+    photos: '사진', video: '영상', gallery: '갤러리', interview: '웨딩 인터뷰', history: '히스토리', tabs: '탭 안내', text: '자유 글', accounts: '마음 전하실 곳',
     rsvp: '참석 여부', photoShare: '사진 공유', guestbook: '방명록', together: '함께한 시간', wreath: '화환 보내기', ending: '엔딩'
   };
   var R = {};
@@ -221,7 +221,7 @@
     h += '<div class="rv">' + (has(w.venue) ? '<p class="vname">' + esc(w.venue) + '</p>' : '') + (has(w.hall) ? '<p class="addr">' + esc(w.hall) + '</p>' : '') +
       (has(w.address) ? '<p class="addr">' + esc(w.address) + ' <button class="copy-mini" data-copy="' + esc(w.address) + '">복사</button></p>' : '') +
       (has(w.tel) ? '<p class="addr"><a href="tel:' + esc(w.tel) + '">Tel. ' + esc(w.tel) + '</a></p>' : '') + '</div>';
-    if (has(w.address)) h += '<div class="map rv"><iframe loading="lazy" title="지도" src="https://maps.google.com/maps?q=' + q + '&z=16&output=embed"></iframe></div>';
+    if (has(w.address)) h += '<div class="map rv">' + (has(S().kakaoKey) ? '<div class="kmap" data-addr="' + esc(w.address) + '" data-name="' + esc(w.venue || '') + '"></div>' : gmap(q)) + '</div>';
     if (has(w.address) || has(w.venue)) h += '<div class="navs rv"><a href="tmap://search?name=' + qn + '"><i style="background:linear-gradient(135deg,#e8336f,#5a6cf0)"></i>티맵</a>' +
       '<a href="https://map.kakao.com/link/search/' + q + '" target="_blank" rel="noopener"><i style="background:#ffd400"></i>카카오맵</a>' +
       '<a href="https://map.naver.com/p/search/' + qn + '" target="_blank" rel="noopener"><i style="background:#03c75a"></i>네이버지도</a></div>';
@@ -231,6 +231,53 @@
       return '<div class="it rv"><h4>' + esc(it.icon || '') + ' <span data-edit="' + ip + '.title">' + fmt(it.title) + '</span></h4>' + T(ip + '.text', 'p') + '</div>';
     }).join('') + '</div>';
     return h;
+  };
+
+  function gmap(q) { return '<iframe loading="lazy" title="지도" src="https://maps.google.com/maps?q=' + q + '&z=16&output=embed"></iframe>'; }
+  // 카카오맵 지도 (카카오 JavaScript 키가 있을 때). 실패하면 구글 지도로 대체
+  function initKakaoMaps() {
+    var els = $$('.kmap'); if (!els.length) return;
+    var fallback = function () { els.forEach(function (el) { el.parentNode.innerHTML = gmap(encodeURIComponent(el.getAttribute('data-addr'))); }); };
+    var draw = function () {
+      window.kakao.maps.load(function () {
+        els.forEach(function (el) {
+          var place = function (lat, lng) {
+            var pos = new kakao.maps.LatLng(lat, lng);
+            var map = new kakao.maps.Map(el, { center: pos, level: 3 });
+            map.setZoomable(false);
+            new kakao.maps.Marker({ position: pos, map: map });
+          };
+          var gc = new kakao.maps.services.Geocoder();
+          gc.addressSearch(el.getAttribute('data-addr'), function (r, st) {
+            if (st === kakao.maps.services.Status.OK) return place(r[0].y, r[0].x);
+            new kakao.maps.services.Places().keywordSearch(el.getAttribute('data-name') || el.getAttribute('data-addr'), function (r2, st2) {
+              if (st2 === kakao.maps.services.Status.OK) place(r2[0].y, r2[0].x);
+              else el.parentNode.innerHTML = gmap(encodeURIComponent(el.getAttribute('data-addr')));
+            });
+          });
+        });
+      });
+    };
+    if (window.kakao && window.kakao.maps) return draw();
+    var s = document.createElement('script');
+    s.src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=' + encodeURIComponent(S().kakaoKey) + '&autoload=false&libraries=services';
+    s.onload = function () { if (window.kakao && window.kakao.maps) draw(); else fallback(); };
+    s.onerror = fallback;
+    document.head.appendChild(s);
+  }
+
+  // 유튜브 영상
+  function ytId(u) {
+    var m = String(u || '').match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/|\/live\/)([A-Za-z0-9_-]{11})/);
+    return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(String(u || '').trim()) ? String(u).trim() : '');
+  }
+  R.video = function (b, p) {
+    var id = ytId(b.url), shorts = /\/shorts\//.test(b.url || '');
+    if (!id && !EDIT) return '';
+    return T(p + '.title', 'h2', 'sec-title rv', '제목 (선택)') +
+      (id ? '<div class="yt rv' + (shorts ? ' shorts' : '') + '"><iframe loading="lazy" title="영상" referrerpolicy="strict-origin-when-cross-origin" src="https://www.youtube-nocookie.com/embed/' + id + '?rel=0&playsinline=1" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe></div>'
+        : '<p class="edit-hint">[편집]에서 유튜브 주소를 넣으면 영상이 보여요. (주소가 없으면 손님에게 이 칸이 안 보여요)</p>') +
+      T(p + '.caption', 'p', 'caption rv', '설명 (선택)');
   };
 
   R.notice = function (b, p) {
@@ -390,6 +437,7 @@
       tick(); afterRender._t = setInterval(tick, 1000);
     }
     gbLoad();
+    initKakaoMaps();
     if (window.InviteEditor && window.InviteEditor.ready) window.InviteEditor.afterRender();
   }
 
@@ -402,6 +450,57 @@
     if (d < 0) { mo--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
     if (mo < 0) { y--; mo += 12; }
     return '"' + (y ? y + '년 ' : '') + mo + '개월 ' + d + '일 ' + Math.floor(rest / 3600) + '시간 ' + Math.floor(rest % 3600 / 60) + '분 ' + (rest % 60) + '초"';
+  }
+
+  /* ---------------- 떨어지는 효과 (컨페티, 벚꽃, 눈, 데이지, 별) ---------------- */
+  var fx = null;
+  function stopEffect() { if (fx) { cancelAnimationFrame(fx.raf); fx.cv.remove(); document.removeEventListener('visibilitychange', fx.vis); window.removeEventListener('resize', fx.size); fx = null; } }
+  function startEffect(type) {
+    stopEffect();
+    if (!type || REDUCE) return;
+    var cv = document.createElement('canvas'); cv.className = 'fx-canvas'; cv.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(cv);
+    var cx = cv.getContext('2d'), W = 0, H = 0, dpr = Math.min(2, window.devicePixelRatio || 1);
+    var acc = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e08d62';
+    var CONF = [acc, '#f6c8b0', '#f4a6b8', '#ffd98a', '#a9d4c2', '#a8c5ea', '#c9b6e8'];
+    var N = type === 'confetti' ? 34 : type === 'snow' ? 40 : 26, parts = [];
+    function size() { W = Math.min(window.innerWidth, 480); H = window.innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; cx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    function make(top) {
+      var s = type === 'snow' ? 2 + Math.random() * 3.5 : type === 'confetti' ? 6 + Math.random() * 5 : 8 + Math.random() * 7;
+      return { x: Math.random() * W, y: top ? -20 - Math.random() * H * 0.3 : Math.random() * H, s: s,
+        vy: (type === 'snow' ? 18 : type === 'confetti' ? 42 : 30) * (0.6 + Math.random() * 0.8), vx: (Math.random() - 0.5) * 14,
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * (type === 'confetti' ? 4 : 1.6), ph: Math.random() * 6.28,
+        c: CONF[(Math.random() * CONF.length) | 0] };
+    }
+    function petal(p) { cx.fillStyle = 'rgba(247,190,204,.9)'; cx.beginPath(); cx.moveTo(0, -p.s * .55); cx.bezierCurveTo(p.s * .6, -p.s * .5, p.s * .5, p.s * .45, 0, p.s * .55); cx.bezierCurveTo(-p.s * .5, p.s * .45, -p.s * .6, -p.s * .5, 0, -p.s * .55); cx.fill(); cx.fillStyle = 'rgba(255,255,255,.9)'; cx.beginPath(); cx.moveTo(0, -p.s * .55); cx.lineTo(p.s * .12, -p.s * .3); cx.lineTo(-p.s * .12, -p.s * .3); cx.fill(); }
+    function daisy(p) { var r = p.s * .5; cx.fillStyle = '#fff'; cx.strokeStyle = 'rgba(0,0,0,.12)'; cx.lineWidth = .6; for (var i = 0; i < 7; i++) { cx.save(); cx.rotate(i * 0.8976); cx.beginPath(); cx.ellipse(0, -r * .62, r * .26, r * .5, 0, 0, 6.28); cx.fill(); cx.stroke(); cx.restore(); } cx.fillStyle = '#f5c84c'; cx.beginPath(); cx.arc(0, 0, r * .3, 0, 6.28); cx.fill(); }
+    function star(p) { var r = p.s * .5, tw = .55 + .45 * Math.sin(p.ph * 2); cx.fillStyle = 'rgba(245,204,96,' + tw + ')'; cx.beginPath(); for (var i = 0; i < 10; i++) { var rr = i % 2 ? r * .45 : r, a = i * .6283 - 1.5708; cx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } cx.closePath(); cx.fill(); }
+    function draw(p) {
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.rot);
+      if (type === 'confetti') { cx.scale(1, Math.cos(p.ph)); cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s * .22, p.s, p.s * .44); }
+      else if (type === 'snow') { cx.fillStyle = 'rgba(205,219,236,.95)'; cx.beginPath(); cx.arc(0, 0, p.s, 0, 6.28); cx.fill(); }
+      else if (type === 'sakura') petal(p);
+      else if (type === 'daisy') daisy(p);
+      else star(p);
+      cx.restore();
+    }
+    size(); for (var i = 0; i < N; i++) parts.push(make(false));
+    var last = performance.now();
+    function frame(now) {
+      var dt = Math.min(0.05, (now - last) / 1000); last = now;
+      cx.clearRect(0, 0, W, H);
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        p.ph += dt * (type === 'confetti' ? 5 : 1.4);
+        p.y += p.vy * dt; p.x += (p.vx + Math.sin(p.ph) * 12) * dt; p.rot += p.vr * dt;
+        if (p.y > H + 20 || p.x < -30 || p.x > W + 30) parts[i] = make(true);
+        draw(p);
+      }
+      fx.raf = requestAnimationFrame(frame);
+    }
+    fx = { cv: cv, raf: 0, size: size, vis: function () { if (document.hidden) cancelAnimationFrame(fx.raf); else { last = performance.now(); fx.raf = requestAnimationFrame(frame); } } };
+    document.addEventListener('visibilitychange', fx.vis); window.addEventListener('resize', size);
+    fx.raf = requestAnimationFrame(frame);
   }
 
   /* ---------------- chrome: header, menu, fabs ---------------- */
@@ -694,8 +793,11 @@
 
   /* ---------------- share ---------------- */
   function share() {
-    var url = location.href.split('#')[0].replace(/[?&]edit\b[^&]*/, ''), title = document.title, og = $('meta[property="og:image"]');
-    var key = S().kakaoKey;
+    var url = location.href.split('#')[0].replace(/[?&]edit\b[^&]*/, '').replace(/[?&]$/, ''), og = $('meta[property="og:image"]');
+    var sh = S().share || {}, title = sh.title || document.title, key = S().kakaoKey;
+    var cov = (C.blocks || []).filter(function (b) { return b.type === 'cover'; })[0];
+    var imgSrc = P(sh.image).src || (cov ? P(cov.photo).src : '');
+    var imageUrl = imgSrc && !/^blob:/.test(resolve(imgSrc)) ? new URL(imgSrc, location.href).href : (og ? og.content : '');
     function fb() {
       if (navigator.share) navigator.share({ title: title, url: url }).catch(function () {});
       else copy(url, '청첩장 주소가 복사되었습니다.');
@@ -706,7 +808,7 @@
         if (!window.Kakao.isInitialized()) window.Kakao.init(key);
         window.Kakao.Share.sendDefault({
           objectType: 'feed',
-          content: { title: title, description: dateText() || '소중한 분들을 초대합니다.', imageUrl: og ? og.content : '', link: { mobileWebUrl: url, webUrl: url } },
+          content: { title: title, description: sh.desc || dateText() || '소중한 분들을 초대합니다.', imageUrl: imageUrl, link: { mobileWebUrl: url, webUrl: url } },
           buttons: [{ title: '청첩장 보기', link: { mobileWebUrl: url, webUrl: url } }]
         });
       } catch (e) { fb(); }
@@ -754,6 +856,7 @@
     render: render, toast: toast, modal: modal,
     // 편집 모드 [미리보기]: 손님 화면과 똑같이 움직임을 다시 재생
     replayMotion: function () { window.scrollTo(0, 0); playHandwriting(); setupReveal(true); onScroll(); },
+    effect: function (on) { if (on) startEffect(S().effect); else stopEffect(); },
     content: function () { return C; },
     setContent: function (c) { C = window.CONTENT = c; render(); }
   };
@@ -767,7 +870,10 @@
         var l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'css/editor.css?v=' + Date.now(); document.head.appendChild(l);
         var s = document.createElement('script'); s.src = 'js/editor.js?v=' + Date.now(); s.onload = function () { window.InviteEditor.init(Invite); }; document.body.appendChild(s);
       }
-    } else if (S().rsvpPopup) setTimeout(rsvpPopup, 1200);
+    } else {
+      startEffect(S().effect);
+      if (S().rsvpPopup) setTimeout(rsvpPopup, 1200);
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

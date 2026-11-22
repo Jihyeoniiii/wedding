@@ -138,3 +138,10 @@ body.ed-preview .ed-bar button:not([data-ed="preview"]):not([data-ed="publish"])
 body.editing .blk { scroll-margin-top: 58px; }
 
 body.editing .menu, body.editing .menu-dim { display: none; }
+
+.ed-samples { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.ed-samples button { text-align: center; padding: 14px 12px; border: 1px solid #ece6e2; border-radius: 10px; background: #fff; font-size: 13.5px; line-height: 1.7; color: #555; font-family: var(--font); }
+.ed-samples button:hover { border-color: var(--accent); }
+.ed-samples small { display: block; margin-top: 6px; color: #aaa; font-size: 12px; }
+body.editing .modal { z-index: 260; }
+body.editing .toast { z-index: 300; }
