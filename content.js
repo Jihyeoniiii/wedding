@@ -31,12 +31,12 @@ window.CONTENT = {
       }
     },
     "wedding": {
-      "date": "",
+      "date": "2027-05-29",
       "time": "",
-      "venue": "",
+      "venue": "한화리조트 해운대 웨딩홀",
       "hall": "",
-      "address": "",
-      "tel": "",
+      "address": "부산광역시 해운대구 마린시티3로 52",
+      "tel": "051-749-5221",
       "tbdText": "예식 날짜와 장소는\n정해지는 대로 다시 안내드리겠습니다."
     },
     "theme": {
@@ -58,7 +58,7 @@ window.CONTENT = {
       "repo": "wedding",
       "branch": "main"
     },
-    "_pub": 1795333489811,
+    "_pub": 1795333656781,
     "effect": "heart"
   },
   "blocks": [
